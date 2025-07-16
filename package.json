@@ -1,0 +1,9 @@
+{
+  "name": "energia-flex-mvp-backend",
+  "version": "1.0.0",
+  "description": "Backend para captura de leads do MVP Energia Flex",
+  "main": "api/capturar-lead.js",
+  "dependencies": {
+    "google-spreadsheet": "^4.1.1"
+  }
+}
