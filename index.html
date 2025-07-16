@@ -1,62 +1,200 @@
-/*
- * API/Backend para Captura de Leads - Energia Flex (MVP)
- * Versão com Correção de Compatibilidade
- */
-
-// CORREÇÃO: Altera a forma de importar a biblioteca para o formato CommonJS, mais compatível com Vercel.
-const { GoogleSpreadsheet } = require('google-spreadsheet');
-
-// CORREÇÃO: Altera a forma de exportar a função para o padrão do Node.js.
-module.exports = async (req, res) => {
-    // Garante que a resposta sempre será JSON.
-    res.setHeader('Content-Type', 'application/json');
-
-    // Permite que apenas o método POST seja usado
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Apenas o método POST é permitido.' });
-    }
-
-    try {
-        // 1. Carrega as credenciais e o ID da planilha a partir das Variáveis de Ambiente da Vercel.
-        const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
-        const GOOGLE_CREDENTIALS_JSON = process.env.GOOGLE_CREDENTIALS;
-
-        if (!SPREADSHEET_ID || !GOOGLE_CREDENTIALS_JSON) {
-            console.error('Variáveis de ambiente SPREADSHEET_ID ou GOOGLE_CREDENTIALS não foram definidas na Vercel.');
-            return res.status(500).json({ message: 'Erro de configuração no servidor.' });
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energia Flex - Simule sua Economia na Conta de Luz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
         }
-        
-        const creds = JSON.parse(GOOGLE_CREDENTIALS_JSON);
-
-        // 2. Pega os dados enviados do formulário no frontend
-        const { cep, consumo, tipo_cliente, email } = req.body;
-
-        if (!cep || !consumo || !tipo_cliente || !email) {
-            return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+        :root {
+            --brand-green: #00843D;
+            --brand-blue: #003D7A;
+            --brand-accent-green: #6ABD45;
+            --brand-accent-orange: #F58634;
+            --brand-accent-blue: #0093D0;
+            --brand-bg-light: #F2FAF5;
         }
+        .hero-bg { background-color: var(--brand-bg-light); }
+        .fade-in { animation: fadeIn 1s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-white text-[var(--brand-blue)]">
 
-        // 3. Conecta com a Planilha Google
-        const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
-        await doc.useServiceAccountAuth(creds);
-        await doc.loadInfo(); 
+    <!-- Cabeçalho -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <svg class="h-10 w-auto mr-3" viewBox="0 0 105 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M91.4648 34.9333C89.4348 22.0133 78.4348 0 51.4648 0C24.2648 0 2.0248 20.68 0.294805 24.3L0.144805 24.88C0.144805 24.88 12.0548 43.12 32.8148 54.4C43.1948 59.98 53.9348 62.16 62.7548 61.04C59.3948 47.78 63.1148 34.52 73.1348 26.6C83.1548 18.68 95.0548 22.4 99.1448 36.78L91.4648 34.9333Z" fill="#6ABD45"/>
+                    <path d="M74.9223 68.02C72.8923 55.1 61.8923 34.24 34.9223 34.24C7.7223 34.24 -14.5177 54.92 -16.2477 58.54L-16.3977 59.12C-16.3977 59.12 -4.4877 77.36 16.2723 88.64C26.6523 94.22 37.3923 96.4 46.2123 95.28C42.8523 82.02 46.5723 68.76 56.5923 60.84C66.6123 52.92 78.5123 56.64 82.6023 71.02L74.9223 68.02Z" fill="#F58634"/>
+                    <path d="M58.3799 101.107C56.3499 88.1867 45.3499 67.3267 18.3799 67.3267C-8.8201 67.3267 -31.0601 88.0067 -32.7901 91.6267L-32.9401 92.2067C-32.9401 92.2067 -21.0301 110.447 -0.270101 121.727C10.1099 127.307 20.8499 129.487 29.6699 128.367C26.3099 115.107 30.0299 101.847 40.0499 93.9267C50.0699 86.0067 61.9699 89.7267 66.0599 104.107L58.3799 101.107Z" fill="#0093D0"/>
+                </svg>
+                <div>
+                    <div class="text-base font-bold leading-tight" style="color: var(--brand-green);">ENERGIA</div>
+                    <div class="text-2xl font-extrabold leading-tight -mt-1" style="color: var(--brand-blue);">FLEX</div>
+                </div>
+            </div>
+            <nav>
+                <a href="#simulador" class="text-gray-600 hover:text-[var(--brand-green)] font-medium">Simulador</a>
+                <a href="#como-funciona" class="ml-6 text-gray-600 hover:text-[var(--brand-green)] font-medium">Como Funciona</a>
+            </nav>
+        </div>
+    </header>
 
-        const sheet = doc.sheetsByIndex[0];
+    <!-- Seção Principal (Hero) -->
+    <main class="hero-bg">
+        <div class="container mx-auto px-6 py-20 lg:py-24 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-[var(--brand-blue)] leading-tight fade-in">
+                Cansado de pagar caro na conta de luz?
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-700 max-w-3xl mx-auto fade-in" style="animation-delay: 0.2s;">
+                A liberdade de escolher sua energia está chegando. Descubra o quanto você pode economizar no mercado livre. Simples, rápido e 100% digital.
+            </p>
+            <a href="#simulador" class="mt-8 inline-block bg-[var(--brand-green)] text-white font-bold rounded-lg px-8 py-3 text-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105 fade-in" style="animation-delay: 0.4s;">
+                Simular Economia Agora
+            </a>
+        </div>
+    </main>
 
-        // 4. Adiciona uma nova linha com os dados do lead
-        await sheet.addRow({
-            'Data': new Date().toLocaleString('pt-BR'),
-            'Email': email,
-            'CEP': cep,
-            'Consumo (kWh)': consumo,
-            'Tipo de Cliente': tipo_cliente,
-            'Status': 'Novo'
+    <!-- Seção do Simulador -->
+    <section id="simulador" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8 md:p-12 border border-gray-100">
+                <div id="form-wrapper">
+                    <h2 class="text-3xl font-bold text-center mb-2 text-[var(--brand-blue)]">Simulador de Economia</h2>
+                    <p class="text-center text-gray-600 mb-8">Preencha os dados abaixo e veja o potencial de economia na sua fatura.</p>
+                    
+                    <form id="simulation-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="cep" class="block text-sm font-medium text-gray-700 mb-1">Seu CEP</label>
+                                <input type="text" id="cep" name="cep" placeholder="00000-000" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
+                            </div>
+                            <div>
+                                <label for="consumo" class="block text-sm font-medium text-gray-700 mb-1">Consumo mensal (em kWh)</label>
+                                <input type="number" id="consumo" name="consumo" placeholder="Ex: 350" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de cliente</label>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <label class="flex items-center p-4 border border-gray-300 rounded-lg flex-1 cursor-pointer hover:border-[var(--brand-green)] has-[:checked]:border-[var(--brand-green)] has-[:checked]:bg-green-50">
+                                    <input type="radio" name="tipo_cliente" value="residencial" class="h-5 w-5 text-[var(--brand-green)] focus:ring-[var(--brand-green)]" checked>
+                                    <span class="ml-3 text-gray-700">Residencial</span>
+                                </label>
+                                <label class="flex items-center p-4 border border-gray-300 rounded-lg flex-1 cursor-pointer hover:border-[var(--brand-green)] has-[:checked]:border-[var(--brand-green)] has-[:checked]:bg-green-50">
+                                    <input type="radio" name="tipo_cliente" value="comercial" class="h-5 w-5 text-[var(--brand-green)] focus:ring-[var(--brand-green)]">
+                                    <span class="ml-3 text-gray-700">Pequeno Comércio</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Seu melhor e-mail</label>
+                            <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
+                        </div>
+                        <div class="mt-8 text-center">
+                            <button type="submit" id="submit-button" class="w-full md:w-auto bg-[var(--brand-accent-green)] text-white font-bold rounded-lg px-12 py-3 text-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105">
+                                Ver Minha Economia
+                            </button>
+                        </div>
+                    </form>
+                    <div id="status-message" class="mt-6 text-center text-sm font-medium"></div>
+                </div>
+
+                <div id="confirmation-message" class="hidden text-center p-8 border-2 border-dashed border-[var(--brand-green)] rounded-lg bg-green-50">
+                    <h3 class="text-2xl font-bold text-[var(--brand-green)]">Obrigado!</h3>
+                    <p class="mt-2 text-gray-700">Recebemos seus dados. Em breve, você receberá a simulação de economia no seu e-mail.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Seção Como Funciona -->
+    <section id="como-funciona" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12 text-[var(--brand-blue)]">Como é simples economizar com a Energia Flex</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 text-center">
+                <div class="fade-in">
+                    <div class="bg-[var(--brand-accent-blue)] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">1</div>
+                    <h3 class="font-bold text-xl mt-4 mb-2 text-[var(--brand-blue)]">Simule</h3>
+                    <p class="text-gray-600">Preencha seus dados de consumo em menos de 1 minuto.</p>
+                </div>
+                <div class="fade-in" style="animation-delay: 0.2s;">
+                    <div class="bg-[var(--brand-accent-orange)] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">2</div>
+                    <h3 class="font-bold text-xl mt-4 mb-2 text-[var(--brand-blue)]">Compare</h3>
+                    <p class="text-gray-600">Receba e compare propostas de diferentes fornecedores de energia.</p>
+                </div>
+                <div class="fade-in" style="animation-delay: 0.4s;">
+                    <div class="bg-[var(--brand-accent-green)] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">3</div>
+                    <h3 class="font-bold text-xl mt-4 mb-2 text-[var(--brand-blue)]">Contrate e Economize</h3>
+                    <p class="text-gray-600">Escolha a melhor opção e faça a contratação online, sem burocracia.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="bg-[var(--brand-blue)] text-white py-10">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Energia Flex. Todos os direitos reservados.</p>
+            <p class="text-sm text-gray-300 mt-2">Uma solução Arka para democratizar o acesso à energia.</p>
+        </div>
+    </footer>
+
+    <script>
+        const simulationForm = document.getElementById('simulation-form');
+        const formWrapper = document.getElementById('form-wrapper');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const statusMessage = document.getElementById('status-message');
+        const submitButton = document.getElementById('submit-button');
+
+        simulationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+            statusMessage.textContent = '';
+            statusMessage.className = 'mt-6 text-center text-sm font-medium';
+
+            const formData = new FormData(simulationForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/capturar-lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    formWrapper.classList.add('hidden');
+                    confirmationMessage.classList.remove('hidden');
+                } else {
+                    throw new Error(result.message || 'Ocorreu um erro no servidor.');
+                }
+
+            } catch (error) {
+                console.error('Erro no envio do formulário:', error);
+                statusMessage.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                statusMessage.classList.add('text-red-600');
+                
+                submitButton.disabled = false;
+                submitButton.textContent = 'Ver Minha Economia';
+            }
         });
+    </script>
 
-        // 5. Retorna uma resposta de sucesso para o frontend
-        return res.status(200).json({ message: 'Lead cadastrado com sucesso!' });
-
-    } catch (error) {
-        console.error('ERRO DETALHADO:', error);
-        return res.status(500).json({ message: 'Ocorreu um erro ao processar sua solicitação.' });
-    }
-};
+</body>
+</html>
