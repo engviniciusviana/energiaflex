@@ -4,6 +4,7 @@
   "description": "Backend para captura de leads do MVP Energia Flex",
   "main": "api/capturar-lead.js",
   "dependencies": {
-    "google-spreadsheet": "^4.1.1"
+    "google-spreadsheet": "^4.1.1",
+    "google-auth-library": "^9.11.0"
   }
 }
