@@ -1,9 +1,11 @@
 /*
  * API/Backend de Teste Final - Energia Flex
  * Objetivo: Isolar o problema tentando apenas ler o título da planilha.
+ * Versão com nova autenticação (JWT)
  */
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { JWT } = require('google-auth-library'); // Importa a nova biblioteca de autenticação
 
 module.exports = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
@@ -12,7 +14,7 @@ module.exports = async (req, res) => {
         return res.status(405).json({ message: 'Apenas o método POST é permitido.' });
     }
 
-    console.log('Iniciando teste de conexão com Google Sheets...');
+    console.log('Iniciando teste de conexão com Google Sheets (v2)...');
 
     try {
         const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
@@ -24,35 +26,38 @@ module.exports = async (req, res) => {
         }
         
         const creds = JSON.parse(GOOGLE_CREDENTIALS_JSON);
-        console.log('Credenciais carregadas. Email da conta de serviço:', creds.client_email);
-
-        const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
         
-        console.log('Autenticando...');
-        await doc.useServiceAccountAuth(creds);
+        // --- CORREÇÃO PRINCIPAL: Configura a autenticação usando JWT ---
+        const serviceAccountAuth = new JWT({
+          email: creds.client_email,
+          // A chave privada precisa ter as quebras de linha corrigidas
+          key: creds.private_key.replace(/\\n/g, '\n'), 
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+
+        // Passa o objeto de autenticação diretamente ao criar a instância da planilha
+        const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
         
         console.log('Carregando informações do documento...');
         await doc.loadInfo(); 
         console.log('Informações carregadas com sucesso!');
 
-        // Se chegarmos até aqui, a conexão FUNCIONOU.
         const sheetTitle = doc.title;
         console.log('SUCESSO! Título da planilha:', sheetTitle);
 
-        // Retorna o título para o frontend.
         return res.status(200).json({ 
             message: 'Conexão com a planilha bem-sucedida!',
             title: sheetTitle 
         });
 
     } catch (error) {
-        // Se houver um erro, esta é a nossa resposta definitiva.
         console.error('### ERRO DEFINITIVO NA CONEXÃO ###');
         console.error(error);
         return res.status(500).json({ 
             message: 'Falha ao conectar com a API do Google.',
             errorCode: error.code,
-            errorMessage: error.message
+            errorMessage: error.message,
+            errorDetails: error.toString()
         });
     }
 };
