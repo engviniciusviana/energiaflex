@@ -18,8 +18,10 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 // Carrega as credenciais de forma segura (não exponha no código)
 // Em produção, use variáveis de ambiente (process.env)
-const creds = require('./credentials.json'); // Arquivo de credenciais do Google
-const SPREADSHEET_ID = 'SEU_ID_DA_PLANILHA_AQUI'; // Coloque o ID da sua planilha aqui
+//const creds = require('./credentials.json'); // Arquivo de credenciais do Google
+//const SPREADSHEET_ID = '1qoJdK_kMKx6b23EtKt8q5Dhum-pgZMfQaiSJHuErC4I'; // Coloque o ID da sua planilha aqui
+const creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 
 // Função principal da API
 // Em um ambiente serverless (Vercel/Netlify), este handler processa a requisição.
