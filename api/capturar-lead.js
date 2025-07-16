@@ -1,11 +1,10 @@
 /*
- * API/Backend de Teste Final - Energia Flex
- * Objetivo: Isolar o problema tentando apenas ler o título da planilha.
- * Versão com nova autenticação (JWT)
+ * API/Backend para Captura de Leads - Energia Flex (MVP)
+ * Versão Final e Funcional com Autenticação JWT
  */
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { JWT } = require('google-auth-library'); // Importa a nova biblioteca de autenticação
+const { JWT } = require('google-auth-library');
 
 module.exports = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
@@ -13,8 +12,6 @@ module.exports = async (req, res) => {
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Apenas o método POST é permitido.' });
     }
-
-    console.log('Iniciando teste de conexão com Google Sheets (v2)...');
 
     try {
         const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
@@ -27,36 +24,46 @@ module.exports = async (req, res) => {
         
         const creds = JSON.parse(GOOGLE_CREDENTIALS_JSON);
         
-        // --- CORREÇÃO PRINCIPAL: Configura a autenticação usando JWT ---
+        // Configura a autenticação usando o método JWT moderno
         const serviceAccountAuth = new JWT({
           email: creds.client_email,
-          // A chave privada precisa ter as quebras de linha corrigidas
-          key: creds.private_key.replace(/\\n/g, '\n'), 
+          key: creds.private_key.replace(/\\n/g, '\n'), // Corrige as quebras de linha da chave
           scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
 
         // Passa o objeto de autenticação diretamente ao criar a instância da planilha
         const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
         
-        console.log('Carregando informações do documento...');
+        // Carrega as informações do documento (autentica e busca metadados)
         await doc.loadInfo(); 
-        console.log('Informações carregadas com sucesso!');
+        const sheet = doc.sheetsByIndex[0]; // Pega a primeira aba
 
-        const sheetTitle = doc.title;
-        console.log('SUCESSO! Título da planilha:', sheetTitle);
+        // Pega os dados do formulário
+        const { cep, consumo, tipo_cliente, email } = req.body;
 
-        return res.status(200).json({ 
-            message: 'Conexão com a planilha bem-sucedida!',
-            title: sheetTitle 
+        if (!cep || !consumo || !tipo_cliente || !email) {
+            return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+        }
+
+        // Adiciona a nova linha na planilha
+        await sheet.addRow({
+            'Data': new Date().toLocaleString('pt-BR'),
+            'Email': email,
+            'CEP': cep,
+            'Consumo (kWh)': consumo,
+            'Tipo de Cliente': tipo_cliente,
+            'Status': 'Novo'
         });
 
+        // Retorna sucesso
+        return res.status(200).json({ message: 'Lead cadastrado com sucesso!' });
+
     } catch (error) {
-        console.error('### ERRO DEFINITIVO NA CONEXÃO ###');
+        // Captura qualquer erro que acontecer durante o processo
+        console.error('### ERRO DEFINITIVO ###');
         console.error(error);
         return res.status(500).json({ 
-            message: 'Falha ao conectar com a API do Google.',
-            errorCode: error.code,
-            errorMessage: error.message,
+            message: 'Falha ao processar a solicitação.',
             errorDetails: error.toString()
         });
     }
