@@ -12,21 +12,16 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Definindo as cores da marca para usar com Tailwind */
         :root {
             --brand-green: #00843D;
             --brand-blue: #003D7A;
             --brand-accent-green: #6ABD45;
             --brand-accent-orange: #F58634;
             --brand-accent-blue: #0093D0;
-            --brand-bg-light: #F2FAF5; /* Um verde bem claro para o fundo */
+            --brand-bg-light: #F2FAF5;
         }
-        .hero-bg {
-            background-color: var(--brand-bg-light);
-        }
-        .fade-in {
-            animation: fadeIn 1s ease-in-out;
-        }
+        .hero-bg { background-color: var(--brand-bg-light); }
+        .fade-in { animation: fadeIn 1s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -38,7 +33,6 @@
     <!-- Cabeçalho -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <!-- Logotipo SVG Integrado -->
             <div class="flex items-center">
                 <svg class="h-10 w-auto mr-3" viewBox="0 0 105 105" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M91.4648 34.9333C89.4348 22.0133 78.4348 0 51.4648 0C24.2648 0 2.0248 20.68 0.294805 24.3L0.144805 24.88C0.144805 24.88 12.0548 43.12 32.8148 54.4C43.1948 59.98 53.9348 62.16 62.7548 61.04C59.3948 47.78 63.1148 34.52 73.1348 26.6C83.1548 18.68 95.0548 22.4 99.1448 36.78L91.4648 34.9333Z" fill="#6ABD45"/>
@@ -57,150 +51,121 @@
         </div>
     </header>
 
-    <!-- Seção Principal (Hero) -->
-    <main class="hero-bg">
-        <div class="container mx-auto px-6 py-20 lg:py-24 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-[var(--brand-blue)] leading-tight fade-in">
-                Cansado de pagar caro na conta de luz?
-            </h1>
-            <p class="mt-4 text-lg md:text-xl text-gray-700 max-w-3xl mx-auto fade-in" style="animation-delay: 0.2s;">
-                A liberdade de escolher sua energia está chegando. Descubra o quanto você pode economizar no mercado livre. Simples, rápido e 100% digital.
-            </p>
-            <a href="#simulador" class="mt-8 inline-block bg-[var(--brand-green)] text-white font-bold rounded-lg px-8 py-3 text-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105 fade-in" style="animation-delay: 0.4s;">
-                Simular Economia Agora
-            </a>
-        </div>
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Seção do Simulador -->
+        <section id="simulador" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8 md:p-12 border border-gray-100">
+                    <h2 class="text-3xl font-bold text-center mb-2 text-[var(--brand-blue)]">Simulador de Economia</h2>
+                    <p class="text-center text-gray-600 mb-8">Preencha os dados abaixo e veja o potencial de economia na sua fatura.</p>
+                    
+                    <div id="form-container">
+                        <form id="simulation-form">
+                            <!-- Campos do formulário (CEP, Consumo, etc.) -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="cep" class="block text-sm font-medium text-gray-700 mb-1">Seu CEP</label>
+                                    <input type="text" id="cep" name="cep" placeholder="00000-000" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
+                                </div>
+                                <div>
+                                    <label for="consumo" class="block text-sm font-medium text-gray-700 mb-1">Consumo mensal (em kWh)</label>
+                                    <input type="number" id="consumo" name="consumo" placeholder="Ex: 350" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de cliente</label>
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <label class="flex items-center p-4 border border-gray-300 rounded-lg flex-1 cursor-pointer hover:border-[var(--brand-green)] has-[:checked]:border-[var(--brand-green)] has-[:checked]:bg-green-50">
+                                        <input type="radio" name="tipo_cliente" value="residencial" class="h-5 w-5 text-[var(--brand-green)] focus:ring-[var(--brand-green)]" checked>
+                                        <span class="ml-3 text-gray-700">Residencial</span>
+                                    </label>
+                                    <label class="flex items-center p-4 border border-gray-300 rounded-lg flex-1 cursor-pointer hover:border-[var(--brand-green)] has-[:checked]:border-[var(--brand-green)] has-[:checked]:bg-green-50">
+                                        <input type="radio" name="tipo_cliente" value="comercial" class="h-5 w-5 text-[var(--brand-green)] focus:ring-[var(--brand-green)]">
+                                        <span class="ml-3 text-gray-700">Pequeno Comércio</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Seu melhor e-mail</label>
+                                <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
+                            </div>
+                            <div class="mt-8 text-center">
+                                <button type="submit" id="submit-button" class="w-full md:w-auto bg-[var(--brand-accent-green)] text-white font-bold rounded-lg px-12 py-3 text-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105">
+                                    Ver Minha Economia
+                                </button>
+                            </div>
+                        </form>
+                        <!-- Área para exibir mensagens de status e erro -->
+                        <div id="status-message" class="mt-6 text-center text-sm font-medium"></div>
+                    </div>
+
+                    <!-- Mensagem de Confirmação -->
+                    <div id="confirmation-message" class="hidden text-center p-8 border-2 border-dashed border-[var(--brand-green)] rounded-lg bg-green-50">
+                        <h3 class="text-2xl font-bold text-[var(--brand-green)]">Obrigado!</h3>
+                        <p class="mt-2 text-gray-700">Recebemos seus dados. Em breve, você receberá a simulação de economia no seu e-mail.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
-
-    <!-- Seção do Simulador -->
-    <section id="simulador" class="py-20 bg-white">
-        <div class="container mx-auto px-6">
-            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-8 md:p-12 border border-gray-100">
-                <h2 class="text-3xl font-bold text-center mb-2 text-[var(--brand-blue)]">Simulador de Economia</h2>
-                <p class="text-center text-gray-600 mb-8">Preencha os dados abaixo e veja o potencial de economia na sua fatura.</p>
-                
-                <div id="form-container">
-                    <form id="simulation-form">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Campo CEP -->
-                            <div>
-                                <label for="cep" class="block text-sm font-medium text-gray-700 mb-1">Seu CEP</label>
-                                <input type="text" id="cep" name="cep" placeholder="00000-000" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
-                            </div>
-
-                            <!-- Campo Consumo Mensal -->
-                            <div>
-                                <label for="consumo" class="block text-sm font-medium text-gray-700 mb-1">Consumo mensal (em kWh)</label>
-                                <input type="number" id="consumo" name="consumo" placeholder="Ex: 350" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
-                                <p class="text-xs text-gray-500 mt-1">Você encontra essa informação na sua conta de luz.</p>
-                            </div>
-                        </div>
-
-                        <!-- Campo Tipo de Cliente -->
-                        <div class="mt-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de cliente</label>
-                            <div class="flex flex-col sm:flex-row gap-4">
-                                <label class="flex items-center p-4 border border-gray-300 rounded-lg flex-1 cursor-pointer hover:border-[var(--brand-green)] has-[:checked]:border-[var(--brand-green)] has-[:checked]:bg-green-50">
-                                    <input type="radio" name="tipo_cliente" value="residencial" class="h-5 w-5 text-[var(--brand-green)] focus:ring-[var(--brand-green)]" checked>
-                                    <span class="ml-3 text-gray-700">Residencial</span>
-                                </label>
-                                <label class="flex items-center p-4 border border-gray-300 rounded-lg flex-1 cursor-pointer hover:border-[var(--brand-green)] has-[:checked]:border-[var(--brand-green)] has-[:checked]:bg-green-50">
-                                    <input type="radio" name="tipo_cliente" value="comercial" class="h-5 w-5 text-[var(--brand-green)] focus:ring-[var(--brand-green)]">
-                                    <span class="ml-3 text-gray-700">Pequeno Comércio</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- Campo Email para receber a cotação -->
-                        <div class="mt-6">
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Seu melhor e-mail</label>
-                            <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)] transition">
-                             <p class="text-xs text-gray-500 mt-1">Enviaremos a simulação e os próximos passos para este e-mail.</p>
-                        </div>
-
-                        <!-- Botão de Envio -->
-                        <div class="mt-8 text-center">
-                            <button type="submit" class="w-full md:w-auto bg-[var(--brand-accent-green)] text-white font-bold rounded-lg px-12 py-3 text-lg hover:bg-opacity-90 transition duration-300 transform hover:scale-105">
-                                Ver Minha Economia
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Mensagem de Confirmação -->
-                <div id="confirmation-message" class="hidden text-center p-8 border-2 border-dashed border-[var(--brand-green)] rounded-lg bg-green-50">
-                    <h3 class="text-2xl font-bold text-[var(--brand-green)]">Obrigado!</h3>
-                    <p class="mt-2 text-gray-700">Recebemos seus dados. Em breve, você receberá a simulação de economia no seu e-mail.</p>
-                    <p class="mt-4 text-sm text-gray-500">Você está um passo mais perto de ter mais liberdade e controle sobre sua energia.</p>
-                </div>
-
-            </div>
-        </div>
-    </section>
     
-    <!-- Seção Como Funciona -->
-    <section id="como-funciona" class="py-20 bg-gray-50">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-12 text-[var(--brand-blue)]">Como é simples economizar com a Energia Flex</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 text-center">
-                <!-- Passo 1 -->
-                <div class="fade-in">
-                    <div class="bg-[var(--brand-accent-blue)] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">1</div>
-                    <h3 class="font-bold text-xl mt-4 mb-2 text-[var(--brand-blue)]">Simule</h3>
-                    <p class="text-gray-600">Preencha seus dados de consumo em menos de 1 minuto.</p>
-                </div>
-                <!-- Passo 2 -->
-                <div class="fade-in" style="animation-delay: 0.2s;">
-                    <div class="bg-[var(--brand-accent-orange)] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">2</div>
-                    <h3 class="font-bold text-xl mt-4 mb-2 text-[var(--brand-blue)]">Compare</h3>
-                    <p class="text-gray-600">Receba e compare propostas de diferentes fornecedores de energia.</p>
-                </div>
-                <!-- Passo 3 -->
-                <div class="fade-in" style="animation-delay: 0.4s;">
-                    <div class="bg-[var(--brand-accent-green)] text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">3</div>
-                    <h3 class="font-bold text-xl mt-4 mb-2 text-[var(--brand-blue)]">Contrate e Economize</h3>
-                    <p class="text-gray-600">Escolha a melhor opção e faça a contratação online, sem burocracia.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Rodapé -->
     <footer class="bg-[var(--brand-blue)] text-white py-10">
         <div class="container mx-auto px-6 text-center">
             <p>&copy; 2025 Energia Flex. Todos os direitos reservados.</p>
-            <p class="text-sm text-gray-300 mt-2">Uma solução Arka para democratizar o acesso à energia.</p>
         </div>
     </footer>
 
     <script>
-        // Script para mascarar o CEP
-        const cepInput = document.getElementById('cep');
-        cepInput.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, '');
-            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
-            e.target.value = value.slice(0, 9);
-        });
-
-        // Script para lidar com o envio do formulário
-        const formContainer = document.getElementById('form-container');
         const simulationForm = document.getElementById('simulation-form');
+        const formContainer = document.getElementById('form-container');
         const confirmationMessage = document.getElementById('confirmation-message');
+        const statusMessage = document.getElementById('status-message');
+        const submitButton = document.getElementById('submit-button');
 
-        simulationForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Impede o envio real do formulário
+        simulationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            // Aqui você pode adicionar a lógica para capturar os dados (ex: enviar para uma planilha ou API)
+            // Desabilita o botão e mostra mensagem de envio
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+            statusMessage.textContent = '';
+            statusMessage.className = 'mt-6 text-center text-sm font-medium';
+
+
             const formData = new FormData(simulationForm);
             const data = Object.fromEntries(formData.entries());
-            console.log('Lead capturado:', data);
 
-            // Esconde o formulário e mostra a mensagem de confirmação
-            formContainer.classList.add('hidden');
-            confirmationMessage.classList.remove('hidden');
-            
-            // Rola a tela para a mensagem de confirmação
-            confirmationMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            try {
+                const response = await fetch('/api/capturar-lead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                // Pega a resposta da API para análise
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Sucesso!
+                    formContainer.classList.add('hidden');
+                    confirmationMessage.classList.remove('hidden');
+                } else {
+                    // A API retornou um erro (ex: 400, 500)
+                    throw new Error(result.message || 'Ocorreu um erro no servidor.');
+                }
+
+            } catch (error) {
+                // Erro de rede ou erro lançado pelo 'throw' acima
+                console.error('Erro no envio do formulário:', error);
+                statusMessage.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                statusMessage.classList.add('text-red-600');
+                
+                // Reabilita o botão
+                submitButton.disabled = false;
+                submitButton.textContent = 'Ver Minha Economia';
+            }
         });
     </script>
 
